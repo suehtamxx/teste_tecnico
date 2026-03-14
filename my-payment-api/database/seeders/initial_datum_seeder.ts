@@ -2,9 +2,16 @@ import { BaseSeeder } from '@adonisjs/lucid/seeders'
 import Client from '#models/client'
 import Product from '#models/product'
 import Gateway from '#models/gateway'
+import User from '#models/user'
 
 export default class extends BaseSeeder {
   async run() {
+
+    await User.create({
+      email: 'admin@loja.com',
+      password: 'senha_segura',
+      role: 'ADMIN'
+    })
     await Client.create({
       name: 'Joao Silva',
       email: 'joao@gmail.com'
