@@ -16,7 +16,7 @@ export class Gateway1Service implements PaymentGateway {
                 })
             })
 
-            if(loginResponse.ok) return false
+            if(!loginResponse.ok) return false
 
             const loginData = await loginResponse.json() as { token: string}
             const gatewayToken = loginData.token
@@ -32,12 +32,17 @@ export class Gateway1Service implements PaymentGateway {
                     name: clientData.name,
                     email: clientData.email,
                     cardNumber: cardData.cardNumber,
-                    cvv: cardData.cvv
+                    cvv: String(cardData.cvv)
                 })
             })
 
-            
-            return paymentResponse.ok
+            const responseData = await paymentResponse.json() as any
+            if(responseData.error || responseData.errors || (responseData.status && responseData.statuscode >= 400)) {
+                console.log('Gateway 1 recusou o cartao')
+                return false
+            }
+
+            return true
         } catch (error) {
           console.error('Erro de conexao no Gateway 1:', error)
           return false
@@ -45,8 +50,36 @@ export class Gateway1Service implements PaymentGateway {
     }
 
     async refund(transactionId: string): Promise<boolean> {
-        console.log('Reembolsando via gateway 1')
+        try {
+            const loginResponse = await fetch(`${this.baseUrl}/login`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    email: 'dev@betalent.tech',
+                    token: 'FEC9BB078BF338F464F96B48089EB498'
+                })
+            })
 
-        return true
-    }
+            if(!loginResponse.ok) return false
+            
+            const loginData = await loginResponse.json() as { token: string }
+            const gatewayToken = loginData.token
+
+            const refundResponse = await fetch(`${this.baseUrl}/transactions/${transactionId}/charge_back`, {
+               method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${gatewayToken}`
+                }
+            })
+
+            return refundResponse.ok
+        } catch (error) {
+            console.error('Erro no Reembolso do Gateway 1:', error)
+            return false
+        }
+    } 
+           
 }
+
+   
