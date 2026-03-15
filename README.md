@@ -90,10 +90,13 @@ Clientes e Gateways:
 
 - **GET /api/v1/gateways** - Lista gateways.
 
-**Observações sobre a Implementação**
+## Observações sobre a Implementação e Pendências
 
-- Validação de Dados: Implementada utilizando o VineJS, garantindo a integridade dos dados antes de tocarem o banco de dados.
+- **O que foi implementado (Destaques):**
+  - **Validação de Dados:** Implementada utilizando o VineJS, garantindo a integridade dos dados antes de tocarem no banco de dados.
+  - **Controle de Acesso:** Criação de Middlewares personalizados para interceptar requisições e garantir que apenas usuários com as *roles* corretas acessem determinados endpoints.
+  - **Resiliência Multi-Gateway:** Foi implementada a lógica de *fallback*. Se a transação falhar no Gateway de maior prioridade, a API tenta automaticamente o próximo. O status final (`PAID` ou `FAILED`) e o ID do Gateway utilizado são registrados dinamicamente no banco.
+  - **Estratégia do Teste:** O foco da entrega foi garantir o funcionamento perfeito dos requisitos de infraestrutura do Nível 3 (Docker, TDD, Roles e Validação), priorizando a segurança da API e a comunicação HTTP real com os Mocks.
 
-- Controle de Acesso: Criação de Middlewares personalizados para interceptar requisições e garantir que apenas usuários com as roles corretas acessem determinados endpoints.
-
-- Estratégia do Teste: O foco da entrega foi garantir o funcionamento perfeito dos requisitos obrigatórios e de infraestrutura do Nível 3 (Docker, TDD, Roles e Validação com VineJS), priorizando a segurança da API e a comunicação HTTP real com os Mocks.
+- **O que ficou pendente:**
+  - **Carrinho de Múltiplos Produtos:** A exigência de receber múltiplos produtos, calcular as quantidades via back-end e registrar na tabela `transaction_products` não foi implementada. A decisão foi tomada para focar o tempo hábil na construção de uma infraestrutura robusta e na comunicação segura e resiliente com as APIs de pagamento (fallback e reembolso).
